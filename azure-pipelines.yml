@@ -16,99 +16,6 @@ parameters:
     - Staging
 
 stages:
-  # Stage for MAUI iOS
-- stage: build_maui_ios
-  jobs:
-  - job: build_maui_ios_app
-    displayName: Build App for iOS
-    pool:
-      vmImage: "macos-13"
-      demands: xcode
-    
-    steps:
-    
-    - script: |
-        echo Environment $(ENVIRONMENT)
-        echo iOS app ID: $(app-id-ios) 
-        echo Agent.JobName $(Agent.JobName)
-        echo Agent.Id $(Agent.Id)
-        echo Agent.Name $(Agent.Name)
-      displayName: Display Vars
-    
-    - task: InstallAppleCertificate@2
-      inputs:
-        certSecureFile: '$(apple-certificate-name)'
-        certPwd: '$(apple-certificate-password)'
-        keychain: 'temp'
-    
-    - task: InstallAppleProvisioningProfile@1
-      inputs:
-        provisioningProfileLocation: 'secureFiles'
-        provProfileSecureFile: '$(apple-provisioning-profile-name)'
-    
-    #  # Extract the version of the last tag you pushed to your Git repository, from the branch you selected to build your pipeline.
-    # - task: ExtractVersionFromTag@1
-    #   displayName: 'Get git tag version'
-    #   inputs:
-    #     projectFolderPath: '$(Build.SourcesDirectory)'
-        
-
-    - task: UseDotNet@2
-      displayName: Install .NET SDK
-      inputs:
-        packageType: 'sdk'
-        version: '$(dotnet-version)'
-        includePreviewVersions: false
-    
-        # Install all workloads your solution is supported
-    - powershell: dotnet workload install maui-android maui-ios maui-tizen
-      displayName: Install .NET MAUI Workload
-      
-  # build project
-    - task: CmdLine@2
-      displayName: 'Build project'
-      inputs:
-       script: |
-         dotnet publish -f $(app-target-framework-ios) -c Release /p:ApplicationDisplayVersion=$(app-display-version) /p:ApplicationVersion=$(app-display-version) /p:ArchiveOnBuild=true /p:EnableAssemblyILStripping=false 
-         
-#/p:CodesignKey=$(apple-codesign-key) /p:CodesignProvision=$(codesignProvisionProvisioningProfile)
- #/p:IpaPackageName=$(app-id-ios) renames the ipa
-# $(app-path-project) 
-#/p:ApplicationDisplayVersion=$(MAJOR).$(MINOR).$(PATCH) /p:ApplicationVersion=$(PRE_RELEASE)
-    - task: CopyFiles@2
-      displayName: 'Copy files to: $(build.artifactstagingdirectory)'
-      inputs:
-        SourceFolder: '$(Agent.BuildDirectory)'
-        Contents: '**/*.ipa'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)'
-        CleanTargetFolder: true
-        flattenFolders: true
-      
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifacts'
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop_maui_ios'
-        publishLocation: 'Container'
-
-    - task: CopyFiles@2
-      displayName: 'Copy files to: $(build.artifactstagingdirectory)'
-      inputs:
-        SourceFolder: '$(system.defaultworkingdirectory)'
-        Contents: '**\bin\**'
-        TargetFolder: '$(build.artifactstagingdirectory)'
-        CleanTargetFolder: true
-        
-    - task: AppCenterDistribute@3
-      inputs:
-        serverEndpoint: 'ITSGoMauiIOSAppcenterConnection'
-        appSlug: 'its-2/ITS-Go-MAUI-iOS'
-        appFile: '$(build.artifactstagingdirectory)/*.ipa'    #'$(build.artifactstagingdirectory)/$(app-id-ios).ipa'
-        releaseNotesOption: 'input'
-        releaseNotesInput: '.'
-        destinationType: 'groups'
-
-
 #-------------------- ANDROID ------------------------------------------------
 
   # Stage for MAUI Android
@@ -244,3 +151,98 @@ stages:
         releaseNotesOption: 'input'
         releaseNotesInput: '.'
         destinationType: 'groups'
+#--- END Android ----------------------------------------------------------------------------------------------------------
+
+  # Stage for MAUI iOS
+- stage: build_maui_ios
+  jobs:
+  - job: build_maui_ios_app
+    displayName: Build App for iOS
+    pool:
+      vmImage: "macos-13"
+      demands: xcode
+    
+    steps:
+    
+    - script: |
+        echo Environment $(ENVIRONMENT)
+        echo iOS app ID: $(app-id-ios) 
+        echo Agent.JobName $(Agent.JobName)
+        echo Agent.Id $(Agent.Id)
+        echo Agent.Name $(Agent.Name)
+      displayName: Display Vars
+    
+    - task: InstallAppleCertificate@2
+      inputs:
+        certSecureFile: '$(apple-certificate-name)'
+        certPwd: '$(apple-certificate-password)'
+        keychain: 'temp'
+    
+    - task: InstallAppleProvisioningProfile@1
+      inputs:
+        provisioningProfileLocation: 'secureFiles'
+        provProfileSecureFile: '$(apple-provisioning-profile-name)'
+    
+    #  # Extract the version of the last tag you pushed to your Git repository, from the branch you selected to build your pipeline.
+    # - task: ExtractVersionFromTag@1
+    #   displayName: 'Get git tag version'
+    #   inputs:
+    #     projectFolderPath: '$(Build.SourcesDirectory)'
+        
+
+    - task: UseDotNet@2
+      displayName: Install .NET SDK
+      inputs:
+        packageType: 'sdk'
+        version: '$(dotnet-version)'
+        includePreviewVersions: false
+    
+        # Install all workloads your solution is supported
+    - powershell: dotnet workload install maui-android maui-ios maui-tizen
+      displayName: Install .NET MAUI Workload
+      
+  # build project
+    - task: CmdLine@2
+      displayName: 'Build project'
+      inputs:
+       script: |
+         dotnet publish -f $(app-target-framework-ios) -c Release /p:ApplicationDisplayVersion=$(app-display-version) /p:ApplicationVersion=$(app-display-version) /p:ArchiveOnBuild=true /p:EnableAssemblyILStripping=false 
+         
+#/p:CodesignKey=$(apple-codesign-key) /p:CodesignProvision=$(codesignProvisionProvisioningProfile)
+ #/p:IpaPackageName=$(app-id-ios) renames the ipa
+# $(app-path-project) 
+#/p:ApplicationDisplayVersion=$(MAJOR).$(MINOR).$(PATCH) /p:ApplicationVersion=$(PRE_RELEASE)
+    - task: CopyFiles@2
+      displayName: 'Copy files to: $(build.artifactstagingdirectory)'
+      inputs:
+        SourceFolder: '$(Agent.BuildDirectory)'
+        Contents: '**/*.ipa'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        CleanTargetFolder: true
+        flattenFolders: true
+      
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifacts'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop_maui_ios'
+        publishLocation: 'Container'
+
+    - task: CopyFiles@2
+      displayName: 'Copy files to: $(build.artifactstagingdirectory)'
+      inputs:
+        SourceFolder: '$(system.defaultworkingdirectory)'
+        Contents: '**\bin\**'
+        TargetFolder: '$(build.artifactstagingdirectory)'
+        CleanTargetFolder: true
+        
+    - task: AppCenterDistribute@3
+      inputs:
+        serverEndpoint: 'ITSGoMauiIOSAppcenterConnection'
+        appSlug: 'its-2/ITS-Go-MAUI-iOS'
+        appFile: '$(build.artifactstagingdirectory)/*.ipa'    #'$(build.artifactstagingdirectory)/$(app-id-ios).ipa'
+        releaseNotesOption: 'input'
+        releaseNotesInput: '.'
+        destinationType: 'groups'
+
+
