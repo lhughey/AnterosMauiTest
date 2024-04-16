@@ -102,7 +102,7 @@ stages:
     - task: AppCenterDistribute@3
       inputs:
         serverEndpoint: 'ITSGoMauiIOSAppcenterConnection'
-        appSlug: 'its-2/Connect-MAUI-iOS'
+        appSlug: 'its-2/ITS-Go-MAUI-iOS'
         appFile: '$(build.artifactstagingdirectory)/*.ipa'    #'$(build.artifactstagingdirectory)/$(app-id-ios).ipa'
         releaseNotesOption: 'input'
         releaseNotesInput: '.'
@@ -239,7 +239,7 @@ stages:
     - task: AppCenterDistribute@3
       inputs:
         serverEndpoint: 'ITSGoMauiDroidAppcenterConnection'
-        appSlug: 'its-2/Connect-MAUI-Droid'
+        appSlug: 'its-2/ITS-Go-MAUI-Droid'
         appFile: '$(build.artifactstagingdirectory)/*-Signed.aab'
         releaseNotesOption: 'input'
         releaseNotesInput: '.'
