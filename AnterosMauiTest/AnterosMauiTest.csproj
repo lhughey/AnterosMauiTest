@@ -43,6 +43,10 @@
       <CodesignProvision>OnBoard Scanner AdHoc</CodesignProvision>
       <CodesignKey>Apple Distribution: Industrial Training Services, Inc. (V4BSB5L66X)</CodesignKey>
     </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <AndroidSupportedAbis>armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
+      <AndroidDexTool>d8</AndroidDexTool>
+    </PropertyGroup>
     <ItemGroup>
         <!-- App Icon -->
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4"/>
