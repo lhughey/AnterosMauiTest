@@ -92,15 +92,15 @@ stages:
       displayName: Install .NET MAUI Workload
 
     - script: |
-        # Set the version date
+        REM Set the version date
         echo "##vso[task.setvariable variable=VersionDate]$(date +%y%m%d)"
       displayName: 'Set Version Date'
-  
+       
 
-    - task: vs-publisher-473885.motz-mobile-buildtasks.ios-bundle-version.ios-bundle-version@1
-      displayName: 'Bump iOS Versions in  Platforms/iOS/Info.plist up'
+    - task: vs-publisher-473885.motz-mobile-buildtasks.android-manifest-version.android-manifest-version@1
+      displayName: 'Bump Android Versions Platforms/Android/AndroidManifest.xml'
       inputs:
-        sourcePath: '$(projectPathBase)/Platforms/iOS/Info.plist'
+        sourcePath: '$(projectPathBase)/Platforms/Android/AndroidManifest.xml'
         versionName: '$(VersionMajor).$(VersionMinor).$(VersionDate)'
       
 
@@ -214,13 +214,14 @@ stages:
         # Set the version date
         echo "##vso[task.setvariable variable=VersionDate]$(date +%y%m%d)"
       displayName: 'Set Version Date'
-       
+  
 
-    - task: vs-publisher-473885.motz-mobile-buildtasks.android-manifest-version.android-manifest-version@1
-      displayName: 'Bump Android Versions Platforms/Android/AndroidManifest.xml'
+    - task: vs-publisher-473885.motz-mobile-buildtasks.ios-bundle-version.ios-bundle-version@1
+      displayName: 'Bump iOS Versions in  Platforms/iOS/Info.plist up'
       inputs:
-        sourcePath: '$(projectPathBase)/Platforms/Android/AndroidManifest.xml'
+        sourcePath: '$(projectPathBase)/Platforms/iOS/Info.plist'
         versionName: '$(VersionMajor).$(VersionMinor).$(VersionDate)'
+      
 
 
   # build project
