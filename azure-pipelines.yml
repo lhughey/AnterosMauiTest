@@ -15,6 +15,9 @@ parameters:
     - Production
     - Staging
 
+variables:
+  projectPathBase: '$(Build.SourcesDirectory)/AnterosMauiTest'
+
 stages:
 #-------------------- ANDROID ------------------------------------------------
 
@@ -88,6 +91,18 @@ stages:
     - powershell: dotnet workload install maui-android maui-ios maui-tizen
       displayName: Install .NET MAUI Workload
 
+    - script: |
+        # Set the version date
+        echo "##vso[task.setvariable variable=VersionDate]$(date +%y%m%d)"
+      displayName: 'Set Version Date'
+  
+
+    - task: vs-publisher-473885.motz-mobile-buildtasks.ios-bundle-version.ios-bundle-version@1
+      displayName: 'Bump iOS Versions in  Platforms/iOS/Info.plist up'
+      inputs:
+        sourcePath: '$(projectPathBase)/Platforms/iOS/Info.plist'
+        versionName: '$(VersionMajor).$(VersionMinor).$(VersionDate)'
+      
 
     # build project
     #NOTE: the iOS and Android versioning is different. Android requires a int appversion.
@@ -182,13 +197,7 @@ stages:
       inputs:
         provisioningProfileLocation: 'secureFiles'
         provProfileSecureFile: '$(apple-provisioning-profile-name)'
-    
-    #  # Extract the version of the last tag you pushed to your Git repository, from the branch you selected to build your pipeline.
-    # - task: ExtractVersionFromTag@1
-    #   displayName: 'Get git tag version'
-    #   inputs:
-    #     projectFolderPath: '$(Build.SourcesDirectory)'
-        
+
 
     - task: UseDotNet@2
       displayName: Install .NET SDK
@@ -201,6 +210,19 @@ stages:
     - powershell: dotnet workload install maui-android maui-ios maui-tizen
       displayName: Install .NET MAUI Workload
       
+    - script: |
+        # Set the version date
+        echo "##vso[task.setvariable variable=VersionDate]$(date +%y%m%d)"
+      displayName: 'Set Version Date'
+       
+
+    - task: vs-publisher-473885.motz-mobile-buildtasks.android-manifest-version.android-manifest-version@1
+      displayName: 'Bump Android Versions Platforms/Android/AndroidManifest.xml'
+      inputs:
+        sourcePath: '$(projectPathBase)/Platforms/Android/AndroidManifest.xml'
+        versionName: '$(VersionMajor).$(VersionMinor).$(VersionDate)'
+
+
   # build project
     - task: CmdLine@2
       displayName: 'Build project'
